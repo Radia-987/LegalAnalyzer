@@ -1,0 +1,42 @@
+analysis_task:
+  description: >
+    The user has uploaded a contract and provided this specific query: {user_query}.
+    Follow these steps:
+    1. Use the rag_tool with the user's query to retrieve the most relevant
+       chunks from the contract.
+    2. Analyze those retrieved chunks carefully — identify the clauses present,
+       assess risk levels (low/medium/high) with clear reasoning for each.
+    3. For every medium or high risk clause found, use the mcp_tool to find
+       a relevant court case or legal definition that supports your assessment.
+    4. Compile everything into a detailed raw analysis focused on answering
+       the user's query.
+  expected_output: >
+    A detailed analysis containing all relevant clauses found, each with
+    clause type, exact text, risk level (low/medium/high), reasoning, and
+    for every medium or high risk clause a supporting citation.
+  agent: contract_analyst
+
+report_task:
+  description: >
+    Take the full clause analysis from the previous task and structure it
+    into a final professional report that directly answers: {user_query}.
+    The report must have exactly four sections:
+    1. Executive summary — three to five sentences describing what this
+       contract is, its overall risk level, and a direct answer to the
+       user's query.
+    2. Clauses breakdown — all identified clauses organized by type with
+       their risk level clearly labeled.
+    3. Risks and citations — only medium and high risk items, each with
+       severity, a plain-English explanation of why it is risky, and the
+       supporting citation.
+    4. Recommendations — a numbered list of specific things that should be
+       negotiated, clarified, or removed before signing.
+  expected_output: >
+    A valid JSON object with exactly four keys:
+    "executive_summary" as a string,
+    "clauses" as a list of objects each with "type", "text", and "risk_level",
+    "risks" as a list of objects each with "clause_type", "severity",
+    "explanation", and "citation",
+    "recommendations" as a list of strings.
+  agent: report_writer
+  output_file: output/report.json

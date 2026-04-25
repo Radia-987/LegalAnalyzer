@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.pyc
+
+# macOS
+.DS_Store
+
+# Environment variables
+.env
+
+# ChromaDB vector store
+db/
+
+# Generated reports
+analysis.json
+report.md
+
+# Knowledge base PDFs (optional, if not to be tracked)
+knowledge/*.pdf

@@ -1,0 +1,24 @@
+[project]
+name = "legal_analyzer"
+version = "0.1.0"
+description = "legal_analyzer using crewAI"
+authors = [{ name = "Your Name", email = "you@example.com" }]
+requires-python = ">=3.10,<3.14"
+dependencies = [
+    "crewai[tools]==1.14.3"
+]
+
+[project.scripts]
+legal_analyzer = "legal_analyzer.main:run"
+run_crew = "legal_analyzer.main:run"
+train = "legal_analyzer.main:train"
+replay = "legal_analyzer.main:replay"
+test = "legal_analyzer.main:test"
+run_with_trigger = "legal_analyzer.main:run_with_trigger"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.crewai]
+type = "crew"
