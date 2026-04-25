@@ -1,54 +1,193 @@
-# LegalAnalyzer Crew
+# LegalAnalyzer CrewAI
 
-Welcome to the LegalAnalyzer Crew project, powered by [crewAI](https://crewai.com). This template is designed to help you set up a multi-agent AI system with ease, leveraging the powerful and flexible framework provided by crewAI. Our goal is to enable your agents to collaborate effectively on complex tasks, maximizing their collective intelligence and capabilities.
+![Python](https://img.shields.io/badge/Python-3.11+-blue?logo=python) ![CrewAI](https://img.shields.io/badge/CrewAI-Multi--Agent-purple) ![Streamlit](https://img.shields.io/badge/UI-Streamlit-red?logo=streamlit) ![License](https://img.shields.io/badge/License-MIT-green)
 
-## Installation
+**LegalAnalyzer CrewAI** is an AI-powered legal contract analysis tool that leverages Retrieval-Augmented Generation (RAG), ChromaDB, and CrewAI agent orchestration to answer legal questions, analyze contract clauses, and provide real case law citations.
 
-Ensure you have Python >=3.10 <3.14 installed on your system. This project uses [UV](https://docs.astral.sh/uv/) for dependency management and package handling, offering a seamless setup and execution experience.
+---
 
-First, if you haven't already, install uv:
+## ✨ Features
 
-```bash
-pip install uv
+- **Conversational Q&A** — Ask legal questions about your contracts and get structured, AI-generated answers.
+- **RAG Pipeline** — Ingests and indexes all PDF contracts in your `knowledge/` folder using ChromaDB and OpenAI embeddings.
+- **Multi-Agent Workflow**
+  - 🔍 Agent 1 (`contract_analyst`) — Analyzes contract clauses, assigns risk levels, and calls the MCP tool for real case law.
+  - 📝 Agent 2 (`report_writer`) — Writes a clean, structured JSON report from the analysis.
+- **CourtListener Integration** — Fetches real legal case citations for high/medium risk clauses via MCP.
+- **Streamlit UI** — Simple, interactive chat interface for legal Q&A with downloadable JSON reports.
+
+---
+
+## 🛠 Tech Stack
+
+| Tool | Purpose |
+|------|---------|
+| [Python 3.11+](https://www.python.org/) | Core language |
+| [CrewAI](https://github.com/joaomdmoura/crewAI) | Multi-agent orchestration |
+| [LangChain](https://github.com/langchain-ai/langchain) | LLM chaining & tooling |
+| [ChromaDB](https://www.trychroma.com/) | Vector store for RAG |
+| [Streamlit](https://streamlit.io/) | Chat UI |
+| [OpenAI API](https://platform.openai.com/) | LLM + embeddings |
+| [CourtListener MCP](https://www.courtlistener.com/api/) | Real case law citations |
+
+---
+
+## 📁 Project Structure
+
+```
+LegalAnalyzer_CrewAI/
+├── legal_analyzer/
+│   ├── src/
+│   │   └── legal_analyzer/
+│   │       ├── app.py                  # Streamlit UI
+│   │       ├── crew.py                 # CrewAI agents & tasks
+│   │       ├── rag/
+│   │       │   ├── ingestion_pipeline.py
+│   │       │   └── rag_tool.py
+│   │       └── config/
+│   │           ├── agents.yaml
+│   │           └── tasks.yaml
+│   ├── knowledge/                      # Place your PDF contracts here
+│   └── db/
+│       └── chroma_db/                  # Auto-generated vector store
+├── .env                                # API keys (not committed)
+├── requirements.txt
+└── README.md
 ```
 
-Next, navigate to your project directory and install the dependencies:
+---
 
-(Optional) Lock the dependencies and install them by using the CLI command:
-```bash
-crewai install
-```
-### Customizing
+## 🚀 Setup & Installation
 
-**Add your `OPENAI_API_KEY` into the `.env` file**
+### 1. Clone the Repository
 
-- Modify `src/legal_analyzer/config/agents.yaml` to define your agents
-- Modify `src/legal_analyzer/config/tasks.yaml` to define your tasks
-- Modify `src/legal_analyzer/crew.py` to add your own logic, tools and specific args
-- Modify `src/legal_analyzer/main.py` to add custom inputs for your agents and tasks
-
-## Running the Project
-
-To kickstart your crew of AI agents and begin task execution, run this from the root folder of your project:
-
-```bash
-$ crewai run
+```sh
+git clone https://github.com/yourusername/LegalAnalyzer_CrewAI.git
+cd LegalAnalyzer_CrewAI
 ```
 
-This command initializes the legal_analyzer Crew, assembling the agents and assigning them tasks as defined in your configuration.
+### 2. Create & Activate a Virtual Environment
 
-This example, unmodified, will run the create a `report.md` file with the output of a research on LLMs in the root folder.
+```sh
+python -m venv venv
 
-## Understanding Your Crew
+# Windows
+venv\Scripts\activate
 
-The legal_analyzer Crew is composed of multiple AI agents, each with unique roles, goals, and tools. These agents collaborate on a series of tasks, defined in `config/tasks.yaml`, leveraging their collective skills to achieve complex objectives. The `config/agents.yaml` file outlines the capabilities and configurations of each agent in your crew.
+# Mac/Linux
+source venv/bin/activate
+```
 
-## Support
+### 3. Install Dependencies
 
-For support, questions, or feedback regarding the LegalAnalyzer Crew or crewAI.
-- Visit our [documentation](https://docs.crewai.com)
-- Reach out to us through our [GitHub repository](https://github.com/joaomdmoura/crewai)
-- [Join our Discord](https://discord.com/invite/X4JWnZnxPb)
-- [Chat with our docs](https://chatg.pt/DWjSBZn)
+Install all required packages in one command:
 
-Let's create wonders together with the power and simplicity of crewAI.
+```sh
+pip install streamlit crewai crewai-tools langchain chromadb openai python-dotenv httpx pypdf mcp "crewai-tools[mcp]"
+```
+
+If you use unstructured PDF loading, also run:
+
+```sh
+pip install unstructured pdf2image
+```
+
+> 💡 Optional — for testing: `pip install pytest`
+
+### 4. Set Up Environment Variables
+
+Create a `.env` file in the project root:
+
+```env
+OPENAI_API_KEY=your_openai_api_key_here
+```
+
+### 5. Add Your Contract PDFs
+
+Place all your contract/legal PDF files inside the `knowledge/` folder.
+
+### 6. Ingest Documents into ChromaDB
+
+```sh
+cd legal_analyzer
+python src/legal_analyzer/rag/ingestion_pipeline.py
+```
+
+You should see output like:
+```
+ChromaDB path: ...
+Documents in store: 146
+```
+
+### 7. Run the Streamlit App
+
+```sh
+# From the project root:
+streamlit run legal_analyzer/src/legal_analyzer/app.py
+```
+
+Open your browser at **http://localhost:8501**
+
+---
+
+## 💬 Usage
+
+1. Open the Streamlit app in your browser.
+2. Type your legal question in the chat box (e.g. *"Under what circumstances is a surety discharged?"*).
+3. The AI agents will:
+   - Retrieve relevant clauses from your ingested contracts
+   - Fetch real case law citations from CourtListener
+   - Generate a structured report with risk levels and recommendations
+4. Download the full report as a JSON file using the **Download Report** button.
+
+---
+
+## ⚙️ Configuration
+
+| Path | Description |
+|------|-------------|
+| `knowledge/` | Drop your PDF contracts here before ingestion |
+| `db/chroma_db/` | ChromaDB vector store — auto-generated, do not edit |
+| `.env` | Store your `OPENAI_API_KEY` and other secrets |
+| `config/agents.yaml` | Agent roles, goals, and backstories |
+| `config/tasks.yaml` | Task descriptions and expected outputs |
+
+---
+
+## 🧠 How It Works
+
+```
+User Question
+      ↓
+RAG Tool → ChromaDB → Retrieves relevant contract chunks
+      ↓
+MCP Tool → CourtListener → Fetches real case law citations
+      ↓
+contract_analyst agent → Analyzes clauses + assigns risk levels
+      ↓
+report_writer agent → Structures output as JSON report
+      ↓
+Streamlit UI → Renders Executive Summary, Clauses, Risks, Recommendations
+```
+
+---
+
+## 🐛 Troubleshooting
+
+| Problem | Solution |
+|---------|----------|
+| ChromaDB / database errors | Delete `db/chroma_db/` folder and re-run the ingestion pipeline |
+| Module import errors | Ensure you're running from the project root with the venv activated |
+| `MCPServerAdapter` errors | Use positional arg: `MCPServerAdapter({"url": ..., "transport": "streamable-http"})` |
+| `mcp` package missing | Run `pip install mcp` and `pip install "crewai-tools[mcp]"` |
+| Torch warnings on startup | Safe to ignore — these are non-critical warnings from the `torch` library |
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+> Built with ❤️ using CrewAI, ChromaDB, and Streamlit.
